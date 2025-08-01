@@ -145,6 +145,9 @@
 
       // Initialize Highcharts stacked column chart
     Highcharts.chart("example-bar-chart", {
+      accessibility: {
+        enabled: false
+      },
       chart: {
         type: "column",
         height: null,
@@ -193,7 +196,7 @@
         name: formattedBarData[2].name,
         color: {
           pattern: {
-            image: "https://usetrmnl.com/images/grayscale/gray-5.png",
+            image: "https://usetrmnl.com/images/grayscale/gray-4.png",
             width: 12,
             height: 12
           }
@@ -203,7 +206,7 @@
         name: formattedBarData[3].name,
         color: {
           pattern: {
-            image: "https://usetrmnl.com/images/grayscale/gray-7.png",
+            image: "https://usetrmnl.com/images/grayscale/gray-5.png",
             width: 12,
             height: 12
           }
@@ -219,7 +222,6 @@
         gridLineDashStyle: "shortdot",
         gridLineWidth: 1,
         gridLineColor: "#000000",
-        tickAmount: 5,
         title: {
           text: null
         }
@@ -230,11 +232,7 @@
           style: { fontSize: "16px", color: "#000000" },
           y: 20
         },
-        lineWidth: 0,
         gridLineDashStyle: "dot",
-        tickWidth: 0,
-        tickLength: 0,
-        gridLineWidth: 1,
         gridLineColor: "#000000",
         title: {
           text: null
