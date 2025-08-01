@@ -1,0 +1,248 @@
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/pattern-fill.js"></script>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    // Data format: [year, month, day, hour, electricity_price, transmission_cost, renewable_energy_fee, electricity_excise]
+    const rawData = {{ data | json }}
+
+    // Data structure mapping for better maintainability
+    const DATA_FIELDS = {
+      year: 0,
+      month: 1,
+      day: 2,
+      hour: 3,
+      electricityPrice: 4,
+      transmissionCost: 5,
+      renewableEnergyFee: 6,
+      electricityExcise: 7
+    }
+
+    // Metric configuration with data field mapping
+    const METRICS = [
+      { key: 'electricityPrice', label: 'Elektri hind', field: DATA_FIELDS.electricityPrice },
+      { key: 'transmissionCost', label: 'Edastamise tasu', field: DATA_FIELDS.transmissionCost },
+      { key: 'renewableEnergyFee', label: 'Taastuvenergia tasu', field: DATA_FIELDS.renewableEnergyFee },
+      { key: 'electricityExcise', label: 'Elektriaktsiis', field: DATA_FIELDS.electricityExcise }
+    ]
+
+    // Find the lowest total cost time span of specified duration
+    function findLowestTimeSpan(prices, span) {
+      if (prices.length === 0) return { price: 0, start: '00', end: '01' }
+
+      // Calculate total price for each hour
+      const pricesSum = prices.map((x) =>
+        x[DATA_FIELDS.electricityPrice] +
+        x[DATA_FIELDS.transmissionCost] +
+        x[DATA_FIELDS.renewableEnergyFee] +
+        x[DATA_FIELDS.electricityExcise]
+      )
+
+      let lowestSum = Infinity
+      let lowestSumIndex = -1
+
+      for (let i = 0; i < pricesSum.length - span + 1; i++) {
+        const sum = pricesSum.slice(i, i + span).reduce((acc, val) => acc + val, 0)
+
+        if (sum < lowestSum) {
+          lowestSum = sum
+          lowestSumIndex = i
+        }
+      }
+
+      const startHour = rawData[lowestSumIndex][DATA_FIELDS.hour]
+      const endHour = rawData[lowestSumIndex + span] ? rawData[lowestSumIndex + span][DATA_FIELDS.hour] : startHour + span
+
+      return {
+        start: startHour.toString().padStart(2, '0'),
+        end: endHour.toString().padStart(2, '0'),
+        price: (lowestSum / span) * 100 // Convert to cents
+      }
+    }
+
+    // Calculate current total price (first row total in cents)
+    const firstRowValues = rawData[0]
+    const currentTotalPrice = (
+      firstRowValues[DATA_FIELDS.electricityPrice] +
+      firstRowValues[DATA_FIELDS.transmissionCost] +
+      firstRowValues[DATA_FIELDS.renewableEnergyFee] +
+      firstRowValues[DATA_FIELDS.electricityExcise]
+    ) * 100
+
+    // Get current hour for display
+    const currentHour = firstRowValues[DATA_FIELDS.hour].toString().padStart(2, '0')
+    const currentEndHour = (firstRowValues[DATA_FIELDS.hour] + 1).toString().padStart(2, '0')
+
+    // Calculate cheapest periods
+    const cheapest1h = findLowestTimeSpan(rawData, 1)
+    const cheapest2h = findLowestTimeSpan(rawData, 2)
+    const cheapest3h = findLowestTimeSpan(rawData, 3)
+    const cheapest4h = findLowestTimeSpan(rawData, 4)
+
+    // Update the displayed values
+    const displayItems = [
+      { value: currentTotalPrice.toFixed(2), label: `${currentHour}:00 – ${currentEndHour}:00` },
+      { value: cheapest1h.price.toFixed(2), label: `${cheapest1h.start}:00 – ${cheapest1h.end}:00` },
+      { value: cheapest2h.price.toFixed(2), label: `${cheapest2h.start}:00 – ${cheapest2h.end}:00` },
+      { value: cheapest3h.price.toFixed(2), label: `${cheapest3h.start}:00 – ${cheapest3h.end}:00` },
+      { value: cheapest4h.price.toFixed(2), label: `${cheapest4h.start}:00 – ${cheapest4h.end}:00` }
+    ]
+
+      // Update displayed price values
+    const currentValueEl = document.getElementById('current-value')
+    if (currentValueEl) currentValueEl.textContent = displayItems[0].value + '¢'
+
+    const cheapest1hValueEl = document.getElementById('cheapest-1h-value')
+    if (cheapest1hValueEl) cheapest1hValueEl.textContent = displayItems[1].value + '¢'
+
+    const cheapest2hValueEl = document.getElementById('cheapest-2h-value')
+    if (cheapest2hValueEl) cheapest2hValueEl.textContent = displayItems[2].value + '¢'
+
+    const cheapest3hValueEl = document.getElementById('cheapest-3h-value')
+    if (cheapest3hValueEl) cheapest3hValueEl.textContent = displayItems[3].value + '¢'
+
+    const cheapest4hValueEl = document.getElementById('cheapest-4h-value')
+    if (cheapest4hValueEl) cheapest4hValueEl.textContent = displayItems[4].value + '¢'
+
+    // Update displayed time labels
+    const currentTimeEl = document.getElementById('current-time')
+    if (currentTimeEl) currentTimeEl.textContent = displayItems[0].label
+
+    const cheapest1hTimeEl = document.getElementById('cheapest-1h-time')
+    if (cheapest1hTimeEl) cheapest1hTimeEl.textContent = displayItems[1].label
+
+    const cheapest2hTimeEl = document.getElementById('cheapest-2h-time')
+    if (cheapest2hTimeEl) cheapest2hTimeEl.textContent = displayItems[2].label
+
+    const cheapest3hTimeEl = document.getElementById('cheapest-3h-time')
+    if (cheapest3hTimeEl) cheapest3hTimeEl.textContent = displayItems[3].label
+
+    const cheapest4hTimeEl = document.getElementById('cheapest-4h-time')
+    if (cheapest4hTimeEl) cheapest4hTimeEl.textContent = displayItems[4].label
+
+      // Update current price component breakdown (convert to cents)
+    const currentElectricityPriceEl = document.getElementById('current-electricity-price')
+    if (currentElectricityPriceEl) currentElectricityPriceEl.textContent = (firstRowValues[DATA_FIELDS.electricityPrice] * 100).toFixed(2) + '¢'
+
+    const currentTransmissionCostEl = document.getElementById('current-transmission-cost')
+    if (currentTransmissionCostEl) currentTransmissionCostEl.textContent = (firstRowValues[DATA_FIELDS.transmissionCost] * 100).toFixed(2) + '¢'
+
+    const currentRenewableFeeEl = document.getElementById('current-renewable-fee')
+    if (currentRenewableFeeEl) currentRenewableFeeEl.textContent = (firstRowValues[DATA_FIELDS.renewableEnergyFee] * 100).toFixed(2) + '¢'
+
+    const currentExciseEl = document.getElementById('current-excise')
+    if (currentExciseEl) currentExciseEl.textContent = (firstRowValues[DATA_FIELDS.electricityExcise] * 100).toFixed(2) + '¢'
+
+    // Prepare chart data
+    // Convert hours to formatted categories for x-axis
+    const categories = rawData.map(x => x[DATA_FIELDS.hour].toString().padStart(2, '0'))
+
+    // Transform data into chart series format (convert to cents)
+    const formattedBarData = METRICS.map(metric => ({
+      name: metric.label,
+      data: rawData.map(x => x[metric.field] * 100)
+    }))
+
+      // Initialize Highcharts stacked column chart
+    Highcharts.chart("example-bar-chart", {
+      chart: {
+        type: "column",
+        height: null,
+        width: null,
+        animation: false,
+        spacing: [5, 5, 5, 5]
+      },
+      title: {
+        text: null
+      },
+      plotOptions: {
+        series: {
+          animation: false,
+          enableMouseTracking: false,
+          states: {
+            hover: { enabled: false }
+          },
+          pointPadding: 0.05,
+          groupPadding: 0.1,
+          borderWidth: 0,
+          stacking: 'normal'
+        },
+        column: {
+          pointPadding: 0.05,
+          groupPadding: 0.1,
+          borderWidth: 0
+        }
+      },
+      // Data series with distinct visual styles for each metric
+      series: [{
+        data: formattedBarData[0].data,
+        color: "#000000",
+        name: formattedBarData[0].name
+      }, {
+        data: formattedBarData[1].data,
+        name: formattedBarData[1].name,
+        color: {
+          pattern: {
+            image: "https://usetrmnl.com/images/grayscale/gray-3.png",
+            width: 12,
+            height: 12
+          }
+        }
+      }, {
+        data: formattedBarData[2].data,
+        name: formattedBarData[2].name,
+        color: {
+          pattern: {
+            image: "https://usetrmnl.com/images/grayscale/gray-5.png",
+            width: 12,
+            height: 12
+          }
+        }
+      }, {
+        data: formattedBarData[3].data,
+        name: formattedBarData[3].name,
+        color: {
+          pattern: {
+            image: "https://usetrmnl.com/images/grayscale/gray-7.png",
+            width: 12,
+            height: 12
+          }
+        }
+      }],
+      tooltip: { enabled: false },
+      legend: { enabled: false },
+      yAxis: {
+        labels: {
+          style: { fontSize: "16px", color: "#000000" },
+          x: -10
+        },
+        gridLineDashStyle: "shortdot",
+        gridLineWidth: 1,
+        gridLineColor: "#000000",
+        tickAmount: 5,
+        title: {
+          text: null
+        }
+      },
+      xAxis: {
+        categories: categories,
+        labels: {
+          style: { fontSize: "16px", color: "#000000" },
+          y: 20
+        },
+        lineWidth: 0,
+        gridLineDashStyle: "dot",
+        tickWidth: 0,
+        tickLength: 0,
+        gridLineWidth: 1,
+        gridLineColor: "#000000",
+        title: {
+          text: null
+        }
+      },
+      credits: {
+        enabled: false
+      }
+    })
+  })
+</script>

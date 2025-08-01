@@ -1,0 +1,31 @@
+---
+strategy: polling
+no_screen_padding: 'no'
+dark_mode: 'no'
+static_data: ''
+polling_verb: get
+polling_url: https://argoroots-public.s3.eu-central-1.amazonaws.com/borsihind/{{ service }}.json
+polling_headers: ''
+polling_body: ''
+id: 122983
+custom_fields:
+- keyname: about
+  name: About This Plugin
+  field_type: author_bio
+  description: 'This plugin shows Estonian electricity prices from börsihind.ee. Includes all fees: electricity price, transmission cost, renewable energy fee, and electricity excise.'
+  github_url: https://github.com/argoroots
+  learn_more_url: https://www.börsihind.ee
+  email_address: argo@roots.ee
+- keyname: service
+  name: Network service
+  description: Select your network service. Different services have different electricity transmission costs.
+  field_type: select
+  options:
+  - Võrk 1: V1
+  - Võrk 2: V2
+  - Võrk 4: V4
+  - Võrk 5: V5
+  default: V1
+  optional: false
+name: Börsihind.ee
+refresh_interval: 15

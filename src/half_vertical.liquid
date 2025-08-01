@@ -1,0 +1,66 @@
+<div class="view">
+  <div class="layout layout--row gap--space-between">
+    <div class="grid grid--cols-2 h--full">
+      <div class="col--span-1 flex flex--col flex--center-y p--1 pt--3">
+        <span class="value value--tnums value--small" id="current-value"></span>
+        <span class="label text--center" id="current-time"></span>
+
+        <table class="table table--condensed">
+          <tbody>
+            <tr>
+              <td><span class="label label--small">Elektri hind</span></td>
+              <td><span class="label label--small text--right" id="current-electricity-price"></span></td>
+            </tr>
+            <tr>
+              <td><span class="label label--small">Edastamise tasu</span></td>
+              <td><span class="label label--small text--right" id="current-transmission-cost"></span></td>
+            </tr>
+            <tr>
+              <td><span class="label label--small">Taastuvenergia tasu</span></td>
+              <td><span class="label label--small text--right" id="current-renewable-fee"></span></td>
+            </tr>
+            <tr>
+              <td><span class="label label--small">Elektriaktsiis</span></td>
+              <td><span class="label label--small text--right" id="current-excise"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col--span-1 flex flex--col flex--center-y pt--2 pl--6">
+        <div class="w--full flex flex--row flex--top mb--2">
+          <div class="bg--black text--white label label--small px--2">1h</div>
+          <div class="stretch">
+            <span class="title title--small" id="cheapest-1h-time"></span>
+            <span class="label label--small" id="cheapest-1h-value"></span>
+          </div>
+        </div>
+        <div class="w--full flex flex--row flex--top mb--2">
+          <div class="bg--black text--white label label--small px--2">2h</div>
+          <div class="stretch">
+            <span class="title title--small" id="cheapest-2h-time"></span>
+            <span class="label label--small" id="cheapest-2h-value"></span>
+          </div>
+        </div>
+        <div class="w--full flex flex--row flex--top mb--2">
+          <div class="bg--black text--white label label--small px--2">3h</div>
+          <div class="stretch">
+            <span class="title title--small" id="cheapest-3h-time"></span>
+            <span class="label label--small" id="cheapest-3h-value"></span>
+          </div>
+        </div>
+        <div class="w--full flex flex--row flex--top">
+          <div class="bg--black text--white label label--small px--2">4h</div>
+          <div class="stretch">
+            <span class="title title--small" id="cheapest-4h-time"></span>
+            <span class="label label--small" id="cheapest-4h-value"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col--span-2 p--1">
+        <div id="example-bar-chart" class="w--full h--full"></div>
+      </div>
+    </div>
+  </div>
+</div>
