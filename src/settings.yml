@@ -13,7 +13,7 @@ custom_fields:
   name: About This Plugin
   field_type: author_bio
   description: 'This plugin shows Estonian electricity prices from börsihind.ee. Includes all fees: electricity price, transmission cost, renewable energy fee, and electricity excise.'
-  github_url: https://github.com/argoroots
+  github_url: https://github.com/argoroots/elekter-trmnl
   learn_more_url: https://www.börsihind.ee
   email_address: argo@roots.ee
 - keyname: service
