@@ -1,0 +1,54 @@
+<div class="view">
+  <div class="layout layout--col">
+    <div class="columns">
+      <div class="column">
+        <div class="list" data-list-limit="true" data-list-max-columns="2" data-list-max-height="440">
+          {% assign month = '' %}
+
+          {% for event in data %}
+
+          {% assign current_month = event.start | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m" %}
+
+          {% if month != current_month %}
+          <span class="label label--small label--inverted group-header">{{ event.start | date: "%s" | plus: trmnl.user.utc_offset | date: "%B" | upcase }}</span>
+          {% assign month = current_month %}
+          {% endif %}
+
+          <div class="item my--1">
+            <div class="meta" style="width:20px">
+              <span class="index">{{ event.start | date: "%s" | plus: trmnl.user.utc_offset | date: "%-d" }}</span>
+            </div>
+
+            <div class="content">
+              <span class="title title--small">{{ event.title }}</span>
+
+              <div class="flex">
+                {% if event.start contains 'T' %}
+                <span class="label label--small label--underline" style="min-width:5rem">
+                  {{ event.start | date: "%s" | plus: trmnl.user.utc_offset | date: "%H:%M" }}
+                  –
+                  {{ event.end | date: "%s" | plus: trmnl.user.utc_offset | date: "%H:%M" }}
+                </span>
+                {% endif %}
+
+                {% if event.address %}
+                <span class="label label--small">
+                  {{ event.address }}
+                </span>
+                {% endif %}
+              </div>
+
+              {% if event.description %}
+              <span class="description">
+                {{ event.description }}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
