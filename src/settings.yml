@@ -4,7 +4,7 @@ no_screen_padding: 'no'
 dark_mode: 'no'
 static_data: ''
 polling_verb: get
-polling_url: https://argoroots-public.s3.eu-central-1.amazonaws.com/borsihind/{{ service }}.json
+polling_url: https://argoroots-public.s3.eu-central-1.amazonaws.com/borsihind/{{ plan }}.json
 polling_headers: ''
 polling_body: ''
 id: 122983
@@ -12,13 +12,13 @@ custom_fields:
 - keyname: about
   name: About This Plugin
   field_type: author_bio
-  description: 'This plugin shows Estonian electricity prices from börsihind.ee. Includes all fees: electricity price, transmission cost, renewable energy fee, and electricity excise.'
+  description: Display real-time Estonian electricity prices from börsihind.ee on your TRMNL screen. View current pricing in cents per kWh, find the cheapest 1-4 hour periods for optimal energy usage, and see hourly price trends. Complete breakdown includes electricity price, transmission costs, renewable energy fees, and excise tax.
   github_url: https://github.com/argoroots/elekter-trmnl
-  learn_more_url: https://www.börsihind.ee
+  learn_more_url: https://www.borsihind.ee
   email_address: argo@roots.ee
-- keyname: service
-  name: Network service
-  description: Select your network service. Different services have different electricity transmission costs.
+- keyname: plan
+  name: Pricing plan
+  description: Select your Elektrilevi network pricing plan. Each plan has different transmission rates that affect your total electricity cost.
   field_type: select
   options:
   - Võrk 1: V1
@@ -27,5 +27,15 @@ custom_fields:
   - Võrk 5: V5
   default: V1
   optional: false
+- keyname: timespan
+  name: Highlighted timespan
+  description: Choose which cheapest hour period to highlight with special styling on the display.
+  field_type: select
+  options:
+  - 1 hour: 1
+  - 2 hours: 2
+  - 3 hours: 3
+  - 4 hours: 4
+  optional: true
 name: Börsihind.ee
 refresh_interval: 15

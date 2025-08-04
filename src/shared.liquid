@@ -1,3 +1,10 @@
+<style>
+  .timespan-selected {
+    border: 2px dotted #000000;
+    border-radius: 5px;
+  }
+</style>
+
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/pattern-fill.js"></script>
 
@@ -5,6 +12,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     // Data format: [year, month, day, hour, electricity_price, transmission_cost, renewable_energy_fee, electricity_excise]
     const rawData = {{ data | json }}
+    const selectedTimespan = "{{ trmnl.plugin_settings.custom_fields_values.timespan }}"
 
     // Data structure mapping for better maintainability
     const DATA_FIELDS = {
@@ -60,18 +68,63 @@
       }
     }
 
+    // Calculate current period price accounting for partial hours
+    function getCurrentPeriodPrice(span, currentMinute = 0) {
+      if (rawData.length < span) return 0
+
+      let totalPrice = 0
+      let totalMinutes = span * 60 // Total minutes in the period
+
+      for (let i = 0; i < span; i++) {
+        const hourData = rawData[i]
+        const hourPrice = (
+          hourData[DATA_FIELDS.electricityPrice] +
+          hourData[DATA_FIELDS.transmissionCost] +
+          hourData[DATA_FIELDS.renewableEnergyFee] +
+          hourData[DATA_FIELDS.electricityExcise]
+        )
+
+        let minutesInThisHour = 60
+
+        // For the first hour, subtract the minutes already passed
+        if (i === 0) {
+          minutesInThisHour = 60 - currentMinute
+        }
+
+        // For the last hour, we might not use the full hour
+        if (i === span - 1) {
+          const remainingMinutes = totalMinutes - ((i * 60) + (i === 0 ? (60 - currentMinute) : 60))
+          if (remainingMinutes < minutesInThisHour) {
+            minutesInThisHour = remainingMinutes
+          }
+        }
+
+        totalPrice += hourPrice * (minutesInThisHour / 60)
+      }
+
+      return (totalPrice / span) * 100 // Convert to cents and return average
+    }
+
     // Calculate current total price (first row total in cents)
     const firstRowValues = rawData[0]
-    const currentTotalPrice = (
+
+    // Get current time for display and calculations
+    const currentHour = firstRowValues[DATA_FIELDS.hour].toString().padStart(2, '0')
+    const currentMinute = new Date().getMinutes() // This gets actual current minute
+    const currentTime = `${currentHour}:${currentMinute.toString().padStart(2, '0')}`
+
+    // Calculate end time for 1-hour period from current minute
+    const endMinute = currentMinute
+    const endHour = (firstRowValues[DATA_FIELDS.hour] + 1).toString().padStart(2, '0')
+    const endTime = `${endHour}:${endMinute.toString().padStart(2, '0')}`
+
+    // Current price being charged right now (this very moment)
+    const currentPrice = (
       firstRowValues[DATA_FIELDS.electricityPrice] +
       firstRowValues[DATA_FIELDS.transmissionCost] +
       firstRowValues[DATA_FIELDS.renewableEnergyFee] +
       firstRowValues[DATA_FIELDS.electricityExcise]
     ) * 100
-
-    // Get current hour for display
-    const currentHour = firstRowValues[DATA_FIELDS.hour].toString().padStart(2, '0')
-    const currentEndHour = (firstRowValues[DATA_FIELDS.hour] + 1).toString().padStart(2, '0')
 
     // Calculate cheapest periods
     const cheapest1h = findLowestTimeSpan(rawData, 1)
@@ -79,59 +132,139 @@
     const cheapest3h = findLowestTimeSpan(rawData, 3)
     const cheapest4h = findLowestTimeSpan(rawData, 4)
 
+    // Calculate current period prices accounting for partial hours
+    const current1hPrice = getCurrentPeriodPrice(1, currentMinute)
+    const current2hPrice = getCurrentPeriodPrice(2, currentMinute)
+    const current3hPrice = getCurrentPeriodPrice(3, currentMinute)
+    const current4hPrice = getCurrentPeriodPrice(4, currentMinute)
+
     // Update the displayed values
     const displayItems = [
-      { value: currentTotalPrice.toFixed(2), label: `${currentHour}:00 – ${currentEndHour}:00` },
-      { value: cheapest1h.price.toFixed(2), label: `${cheapest1h.start}:00 – ${cheapest1h.end}:00` },
-      { value: cheapest2h.price.toFixed(2), label: `${cheapest2h.start}:00 – ${cheapest2h.end}:00` },
-      { value: cheapest3h.price.toFixed(2), label: `${cheapest3h.start}:00 – ${cheapest3h.end}:00` },
-      { value: cheapest4h.price.toFixed(2), label: `${cheapest4h.start}:00 – ${cheapest4h.end}:00` }
+      {
+        value: currentPrice.toFixed(2),
+        label: `${currentHour}:00 – ${endHour}:00`,
+        startTime: `${currentHour}:00`,
+        endTime: `${endHour}:00`,
+        difference: null // Current price has no difference to itself
+      },
+      {
+        value: cheapest1h.price.toFixed(2),
+        label: `${cheapest1h.start}:00 – ${cheapest1h.end}:00`,
+        startTime: `${cheapest1h.start}:00`,
+        endTime: `${cheapest1h.end}:00`,
+        difference: Math.round((currentPrice - cheapest1h.price) / currentPrice * 100) // Percentage difference (rounded)
+      },
+      {
+        value: cheapest2h.price.toFixed(2),
+        label: `${cheapest2h.start}:00 – ${cheapest2h.end}:00`,
+        startTime: `${cheapest2h.start}:00`,
+        endTime: `${cheapest2h.end}:00`,
+        difference: Math.round((currentPrice - cheapest2h.price) / currentPrice * 100) // Percentage difference (rounded)
+      },
+      {
+        value: cheapest3h.price.toFixed(2),
+        label: `${cheapest3h.start}:00 – ${cheapest3h.end}:00`,
+        startTime: `${cheapest3h.start}:00`,
+        endTime: `${cheapest3h.end}:00`,
+        difference: Math.round((currentPrice - cheapest3h.price) / currentPrice * 100) // Percentage difference (rounded)
+      },
+      {
+        value: cheapest4h.price.toFixed(2),
+        label: `${cheapest4h.start}:00 – ${cheapest4h.end}:00`,
+        startTime: `${cheapest4h.start}:00`,
+        endTime: `${cheapest4h.end}:00`,
+        difference: Math.round((currentPrice - cheapest4h.price) / currentPrice * 100) // Percentage difference (rounded)
+      }
     ]
 
       // Update displayed price values
     const currentValueEl = document.getElementById('current-value')
-    if (currentValueEl) currentValueEl.textContent = displayItems[0].value + '¢'
+    if (currentValueEl) currentValueEl.textContent = displayItems[0].value
 
     const cheapest1hValueEl = document.getElementById('cheapest-1h-value')
-    if (cheapest1hValueEl) cheapest1hValueEl.textContent = displayItems[1].value + '¢'
+    if (cheapest1hValueEl) cheapest1hValueEl.textContent = displayItems[1].value
 
     const cheapest2hValueEl = document.getElementById('cheapest-2h-value')
-    if (cheapest2hValueEl) cheapest2hValueEl.textContent = displayItems[2].value + '¢'
+    if (cheapest2hValueEl) cheapest2hValueEl.textContent = displayItems[2].value
 
     const cheapest3hValueEl = document.getElementById('cheapest-3h-value')
-    if (cheapest3hValueEl) cheapest3hValueEl.textContent = displayItems[3].value + '¢'
+    if (cheapest3hValueEl) cheapest3hValueEl.textContent = displayItems[3].value
 
     const cheapest4hValueEl = document.getElementById('cheapest-4h-value')
-    if (cheapest4hValueEl) cheapest4hValueEl.textContent = displayItems[4].value + '¢'
+    if (cheapest4hValueEl) cheapest4hValueEl.textContent = displayItems[4].value
 
-    // Update displayed time labels
+    // Update price difference displays (savings compared to current price as percentage)
+    const cheapest1hDiffEl = document.getElementById('cheapest-1h-diff')
+    if (cheapest1hDiffEl) cheapest1hDiffEl.textContent = displayItems[1].difference > 0 ? `-${displayItems[1].difference}%` : `${displayItems[1].difference}%`
+
+    const cheapest2hDiffEl = document.getElementById('cheapest-2h-diff')
+    if (cheapest2hDiffEl) cheapest2hDiffEl.textContent = displayItems[2].difference > 0 ? `-${displayItems[2].difference}%` : `${displayItems[2].difference}%`
+
+    const cheapest3hDiffEl = document.getElementById('cheapest-3h-diff')
+    if (cheapest3hDiffEl) cheapest3hDiffEl.textContent = displayItems[3].difference > 0 ? `-${displayItems[3].difference}%` : `${displayItems[3].difference}%`
+
+    const cheapest4hDiffEl = document.getElementById('cheapest-4h-diff')
+    if (cheapest4hDiffEl) cheapest4hDiffEl.textContent = displayItems[4].difference > 0 ? `-${displayItems[4].difference}%` : `${displayItems[4].difference}%`
+
+    // Update displayed time labels with justified layout
     const currentTimeEl = document.getElementById('current-time')
     if (currentTimeEl) currentTimeEl.textContent = displayItems[0].label
 
-    const cheapest1hTimeEl = document.getElementById('cheapest-1h-time')
-    if (cheapest1hTimeEl) cheapest1hTimeEl.textContent = displayItems[1].label
+    const cheapest1hStartEl = document.getElementById('cheapest-1h-start')
+    const cheapest1hEndEl = document.getElementById('cheapest-1h-end')
+    if (cheapest1hStartEl && cheapest1hEndEl) {
+      cheapest1hStartEl.textContent = displayItems[1].startTime
+      cheapest1hEndEl.textContent = displayItems[1].endTime
+    }
 
-    const cheapest2hTimeEl = document.getElementById('cheapest-2h-time')
-    if (cheapest2hTimeEl) cheapest2hTimeEl.textContent = displayItems[2].label
+    const cheapest2hStartEl = document.getElementById('cheapest-2h-start')
+    const cheapest2hEndEl = document.getElementById('cheapest-2h-end')
+    if (cheapest2hStartEl && cheapest2hEndEl) {
+      cheapest2hStartEl.textContent = displayItems[2].startTime
+      cheapest2hEndEl.textContent = displayItems[2].endTime
+    }
 
-    const cheapest3hTimeEl = document.getElementById('cheapest-3h-time')
-    if (cheapest3hTimeEl) cheapest3hTimeEl.textContent = displayItems[3].label
+    const cheapest3hStartEl = document.getElementById('cheapest-3h-start')
+    const cheapest3hEndEl = document.getElementById('cheapest-3h-end')
+    if (cheapest3hStartEl && cheapest3hEndEl) {
+      cheapest3hStartEl.textContent = displayItems[3].startTime
+      cheapest3hEndEl.textContent = displayItems[3].endTime
+    }
 
-    const cheapest4hTimeEl = document.getElementById('cheapest-4h-time')
-    if (cheapest4hTimeEl) cheapest4hTimeEl.textContent = displayItems[4].label
+    const cheapest4hStartEl = document.getElementById('cheapest-4h-start')
+    const cheapest4hEndEl = document.getElementById('cheapest-4h-end')
+    if (cheapest4hStartEl && cheapest4hEndEl) {
+      cheapest4hStartEl.textContent = displayItems[4].startTime
+      cheapest4hEndEl.textContent = displayItems[4].endTime
+    }
+
+    // Remove existing selection classes
+    const timespanContainers = ['cheapest-1h-container', 'cheapest-2h-container', 'cheapest-3h-container', 'cheapest-4h-container']
+    timespanContainers.forEach(containerId => {
+      const container = document.getElementById(containerId)
+      if (container) {
+        container.classList.remove('timespan-selected')
+      }
+    })
+
+    // Add selection class to the chosen timespan (only if one is selected)
+    if (selectedTimespan) {
+      const selectedContainer = document.getElementById(`cheapest-${selectedTimespan}h-container`)
+      if (selectedContainer) selectedContainer.classList.add('timespan-selected')
+    }
 
       // Update current price component breakdown (convert to cents)
     const currentElectricityPriceEl = document.getElementById('current-electricity-price')
-    if (currentElectricityPriceEl) currentElectricityPriceEl.textContent = (firstRowValues[DATA_FIELDS.electricityPrice] * 100).toFixed(2) + '¢'
+    if (currentElectricityPriceEl) currentElectricityPriceEl.textContent = (firstRowValues[DATA_FIELDS.electricityPrice] * 100).toFixed(2)
 
     const currentTransmissionCostEl = document.getElementById('current-transmission-cost')
-    if (currentTransmissionCostEl) currentTransmissionCostEl.textContent = (firstRowValues[DATA_FIELDS.transmissionCost] * 100).toFixed(2) + '¢'
+    if (currentTransmissionCostEl) currentTransmissionCostEl.textContent = (firstRowValues[DATA_FIELDS.transmissionCost] * 100).toFixed(2)
 
     const currentRenewableFeeEl = document.getElementById('current-renewable-fee')
-    if (currentRenewableFeeEl) currentRenewableFeeEl.textContent = (firstRowValues[DATA_FIELDS.renewableEnergyFee] * 100).toFixed(2) + '¢'
+    if (currentRenewableFeeEl) currentRenewableFeeEl.textContent = (firstRowValues[DATA_FIELDS.renewableEnergyFee] * 100).toFixed(2)
 
     const currentExciseEl = document.getElementById('current-excise')
-    if (currentExciseEl) currentExciseEl.textContent = (firstRowValues[DATA_FIELDS.electricityExcise] * 100).toFixed(2) + '¢'
+    if (currentExciseEl) currentExciseEl.textContent = (firstRowValues[DATA_FIELDS.electricityExcise] * 100).toFixed(2)
 
     // Prepare chart data
     // Convert hours to formatted categories for x-axis
