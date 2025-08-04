@@ -30,18 +30,9 @@ A comprehensive iCal (.ics) calendar parser that displays upcoming events from a
 - **Multiple Layouts**: Full, half horizontal, half vertical, and quadrant layout options
 - **Clean Output**: Displays event title, start/end times, and location if available
 
-**Technical Details:**
-- Handles line unfolding per iCal specification
-- Two-pass parsing architecture for proper recurrence exception processing
-- Support for Apple Calendar and Google Calendar specific fields  
-- Automatic detection and skipping of deleted/cancelled events
-- Proper duration calculation for multi-day and all-day events
-- Advanced RRULE support including BYDAY, INTERVAL, UNTIL, and COUNT parameters
-- Robust timezone conversion with GMT offset and IANA identifier support
-
 **Location:** `/calendar/`
 
-**Implementation:** `/functions/calendar.js` - A comprehensive 660-line iCal parser with modular function architecture for robust event processing and RFC 5545 compliance.
+**Backend Function:** `/functions/calendar.js` - A comprehensive iCal parser with modular function architecture for robust event processing and RFC 5545 compliance. Uses DigitalOcean App Platform Functions to fetch and parse remote calendar URLs that cannot be accessed directly from TRMNL due to CORS restrictions.
 
 ## Usage
 
