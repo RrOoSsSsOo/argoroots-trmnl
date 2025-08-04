@@ -34,19 +34,14 @@ A comprehensive iCal (.ics) calendar parser that displays upcoming events from a
 
 **Backend Function:** `/functions/calendar.js` - A comprehensive iCal parser with modular function architecture for robust event processing and RFC 5545 compliance. Uses DigitalOcean App Platform Functions to fetch and parse remote calendar URLs that cannot be accessed directly from TRMNL due to CORS restrictions.
 
+**Function Setup:**
+1. Deploy `/functions/calendar.js` to DigitalOcean App Platform as a serverless function
+2. Configure the function URL in your TRMNL plugin settings as the data source
+3. The function accepts a `url` parameter pointing to your iCal (.ics) calendar feed
+4. Returns parsed events in JSON format for display on TRMNL screens
+
 ## Usage
-
-Each plugin directory contains:
-- `settings.yml` - Plugin configuration and custom fields
-- Layout templates: `full.liquid`, `half_horizontal.liquid`, `half_vertical.liquid`, `quadrant.liquid`
-- `shared.liquid` - Common styling and JavaScript (borsihind only)
-
-## Installation
 
 1. Upload the desired plugin directory to your TRMNL plugin marketplace or development environment
 2. Configure the required settings (electricity plan for Börsihind, calendar URL for Family Calendar)
 3. Choose your preferred layout size
-
-## License
-
-MIT License - see LICENSE file for details.
