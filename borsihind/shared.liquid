@@ -59,7 +59,7 @@
       }
 
       const startHour = rawData[lowestSumIndex][DATA_FIELDS.hour]
-      const endHour = rawData[lowestSumIndex + span] ? rawData[lowestSumIndex + span][DATA_FIELDS.hour] : startHour + span
+      const endHour = rawData[lowestSumIndex + span] ? rawData[lowestSumIndex + span][DATA_FIELDS.hour] : (startHour + span) % 24
 
       return {
         start: startHour.toString().padStart(2, '0'),
