@@ -14,5 +14,5 @@ custom_fields:
   name: URL of Calendar
   placeholder: https://example.com/calendar.ics
   help_text: Replace webcal:// with https:// if needed.
-name: Family Calendar
+name: Monthly Events
 refresh_interval: 15

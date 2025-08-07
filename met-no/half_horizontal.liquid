@@ -1,0 +1,155 @@
+{% case current_hour %}
+{% when "00" %}
+{% assign today_hours_to_show = "00,07,15,23" %}
+{% when "01" %}
+{% assign today_hours_to_show = "01,08,15,22" %}
+{% when "02" %}
+{% assign today_hours_to_show = "02,09,16,23" %}
+{% when "03" %}
+{% assign today_hours_to_show = "03,09,15,21" %}
+{% when "04" %}
+{% assign today_hours_to_show = "04,10,16,22" %}
+{% when "05" %}
+{% assign today_hours_to_show = "05,11,17,23" %}
+{% when "06" %}
+{% assign today_hours_to_show = "06,11,17,23" %}
+{% when "07" %}
+{% assign today_hours_to_show = "07,12,17,22" %}
+{% when "08" %}
+{% assign today_hours_to_show = "08,13,18,23" %}
+{% when "09" %}
+{% assign today_hours_to_show = "09,13,17,21" %}
+{% when "10" %}
+{% assign today_hours_to_show = "10,14,18,22" %}
+{% when "11" %}
+{% assign today_hours_to_show = "11,15,19,23" %}
+{% when "12" %}
+{% assign today_hours_to_show = "12,15,18,21" %}
+{% when "13" %}
+{% assign today_hours_to_show = "13,16,19,22" %}
+{% when "14" %}
+{% assign today_hours_to_show = "14,17,20,23" %}
+{% when "15" %}
+{% assign today_hours_to_show = "15,17,19,21" %}
+{% when "16" %}
+{% assign today_hours_to_show = "16,18,20,22" %}
+{% when "17" %}
+{% assign today_hours_to_show = "17,19,21,23" %}
+{% when "18" %}
+{% assign today_hours_to_show = "18,19,21,23" %}
+{% when "19" %}
+{% assign today_hours_to_show = "19,20,21,22" %}
+{% when "20" %}
+{% assign today_hours_to_show = "20,21,22,23" %}
+{% when "21" %}
+{% assign today_hours_to_show = "21,22,23" %}
+{% when "22" %}
+{% assign today_hours_to_show = "22,23" %}
+{% when "23" %}
+{% assign today_hours_to_show = "23" %}
+{% else %}
+{% assign today_hours_to_show = "03,09,15,21" %}
+{% endcase %}
+{% assign today_hours_to_show = today_hours_to_show | split: "," %}
+{% assign tomorrow_hours_to_show = "03,09,15,21" %}
+
+<div class="layout layout--col layout--stretch">
+  <div class="columns">
+    {% comment %} Today's Column {% endcomment %}
+    <div class="column gap--xsmall" data-list-max-columns="1" data-list-limit="true">
+      <span class="label label--small label--inverted group-header">Today</span>
+
+      {% for event in properties.timeseries %}
+      {% assign event_day = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
+      {% assign event_hour = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" %}
+
+      {% unless event_day == today and today_hours_to_show contains event_hour %}
+      {% continue %}
+      {% endunless %}
+
+      <div class="item">
+        <div class="meta w--6">
+          <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
+        </div>
+
+        <div class="content" data-code="{{ event.data.next_1_hours.summary.symbol_code }}">
+          <div class="flex flex--center-y gap--xsmall">
+            <img class="weather-icon" />
+
+            <div>
+              <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
+              <span class="label label--small">{{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }} · <span class="weather-description"></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% comment %} Tomorrow's Column {% endcomment %}
+    <div class="column gap--xsmall" data-list-max-columns="1" data-list-limit="true">
+      <span class="label label--small label--inverted group-header">Tomorrow</span>
+
+      {% for event in properties.timeseries %}
+      {% assign event_day = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
+      {% assign event_hour = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" %}
+
+      {% unless event_day == tomorrow and tomorrow_hours_to_show contains event_hour %}
+      {% continue %}
+      {% endunless %}
+
+      <div class="item">
+        <div class="meta w--6">
+          <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
+        </div>
+
+        <div class="content" data-code="{{ event.data.next_1_hours.summary.symbol_code }}">
+          <div class="flex flex--center-y gap--xsmall">
+            <img class="weather-icon" />
+
+            <div>
+              <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
+              <span class="label label--small">{{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }} · <span class="weather-description"></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% comment %} Rest of Days Column {% endcomment %}
+    <div class="column gap--xsmall" data-list-max-columns="1" data-list-limit="true">
+      {% for event in properties.timeseries %}
+      {% assign event_day = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
+      {% assign event_hour = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" %}
+      {% assign event_utc_hour = event.time | date: "%H" %}
+
+      {% unless event_day != today and event_day != tomorrow and nextday_hours_to_show contains event_utc_hour %}
+      {% continue %}
+      {% endunless %}
+
+      {% if day != event_day %}
+      {% assign day = event_day %}
+      <span class="label label--small label--inverted group-header">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%A" }}</span>
+      {% endif %}
+
+      <div class="item">
+        <div class="meta w--6">
+          <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
+        </div>
+
+        <div class="content" data-code="{{ event.data.next_6_hours.summary.symbol_code }}">
+          <div class="flex flex--center-y gap--xsmall">
+            <img class="weather-icon weather-icon-small" />
+
+            <div>
+              <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
+              <span class="label label--small">{{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }} · <span class="weather-description"></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+---
+strategy: polling
+no_screen_padding: 'no'
+dark_mode: 'no'
+static_data: ''
+polling_verb: get
+polling_url: https://api.met.no/weatherapi/locationforecast/2.0/compact.json?lat={{ latitude }}&lon={{ longitude }}
+polling_headers: user-agent=TRMNL
+polling_body: ''
+id: 132448
+custom_fields:
+- keyname: about
+  name: About This Plugin
+  field_type: author_bio
+  description: Display weather forecast from The Norwegian Meteorological Institute (met.no) on your TRMNL screen. This is not an official plugin. It is developed by Argo Roots and uses the met.no API.
+  github_url: https://github.com/argoroots/trmnl
+  learn_more_url: https://www.met.no
+  email_address: argo@roots.ee
+- keyname: latitude
+  name: Latitude
+  description: Latitude coordinate for the weather location (e.g., 59.4370).
+  field_type: string
+  rows: 1
+  placeholder: '59.4370'
+  required: true
+- keyname: longitude
+  name: Longitude
+  description: Longitude coordinate for the weather location (e.g., 24.7536).
+  field_type: string
+  rows: 1
+  placeholder: '24.7536'
+  required: true
+- keyname: language
+  name: Language
+  description: Language for weather forecast and day names.
+  field_type: select
+  options:
+  - Eesti keel: et
+  - English: en
+  - Norsk: 'no'
+  - Suomi: fi
+  - Svenska: sv
+  default: en
+  optional: false
+name: Met.no Forecast
+refresh_interval: 15

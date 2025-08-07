@@ -1,18 +1,11 @@
-<style>
-  .timespan-selected {
-    border: 1px dotted #000000;
-    border-radius: 0px;
-  }
-</style>
+<script src='https://code.highcharts.com/highcharts.js'></script>
+<script src='https://code.highcharts.com/modules/pattern-fill.js'></script>
 
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/pattern-fill.js"></script>
-
-<script type="text/javascript">
+<script>
   document.addEventListener('DOMContentLoaded', function() {
     // Data format: [year, month, day, hour, electricity_price, transmission_cost, renewable_energy_fee, electricity_excise]
     const rawData = {{ data | json }}
-    const selectedTimespan = "{{ trmnl.plugin_settings.custom_fields_values.timespan }}"
+    const selectedTimespan = '{{ trmnl.plugin_settings.custom_fields_values.timespan }}'
 
     // Data structure mapping for better maintainability
     const DATA_FIELDS = {
@@ -277,12 +270,12 @@
     }))
 
       // Initialize Highcharts stacked column chart
-    Highcharts.chart("example-bar-chart", {
+    Highcharts.chart('example-bar-chart', {
       accessibility: {
         enabled: false
       },
       chart: {
-        type: "column",
+        type: 'column',
         height: null,
         width: null,
         animation: false,
@@ -312,14 +305,14 @@
       // Data series with distinct visual styles for each metric
       series: [{
         data: formattedBarData[0].data,
-        color: "#000000",
+        color: '#000000',
         name: formattedBarData[0].name
       }, {
         data: formattedBarData[1].data,
         name: formattedBarData[1].name,
         color: {
           pattern: {
-            image: "https://usetrmnl.com/images/grayscale/gray-3.png",
+            image: 'https://usetrmnl.com/images/grayscale/gray-3.png',
             width: 12,
             height: 12
           }
@@ -329,7 +322,7 @@
         name: formattedBarData[2].name,
         color: {
           pattern: {
-            image: "https://usetrmnl.com/images/grayscale/gray-4.png",
+            image: 'https://usetrmnl.com/images/grayscale/gray-4.png',
             width: 12,
             height: 12
           }
@@ -339,7 +332,7 @@
         name: formattedBarData[3].name,
         color: {
           pattern: {
-            image: "https://usetrmnl.com/images/grayscale/gray-5.png",
+            image: 'https://usetrmnl.com/images/grayscale/gray-5.png',
             width: 12,
             height: 12
           }
@@ -349,12 +342,12 @@
       legend: { enabled: false },
       yAxis: {
         labels: {
-          style: { fontSize: "16px", color: "#000000" },
+          style: { fontSize: '16px', color: '#000000' },
           x: -10
         },
-        gridLineDashStyle: "shortdot",
+        gridLineDashStyle: 'shortdot',
         gridLineWidth: 1,
-        gridLineColor: "#000000",
+        gridLineColor: '#000000',
         title: {
           text: null
         }
@@ -362,11 +355,11 @@
       xAxis: {
         categories: categories,
         labels: {
-          style: { fontSize: "16px", color: "#000000" },
+          style: { fontSize: '16px', color: '#000000' },
           y: 20
         },
-        gridLineDashStyle: "dot",
-        gridLineColor: "#000000",
+        gridLineDashStyle: 'dot',
+        gridLineColor: '#000000',
         title: {
           text: null
         }
@@ -377,3 +370,15 @@
     })
   })
 </script>
+
+<style>
+  .label--inverted {
+    border-radius: 0 !important;
+    height: 22px !important;
+    line-height: 1.25rem !important;
+  }
+  .timespan-selected {
+    border: 1px dotted #000000 !important;
+    border-radius: 0 !important;
+  }
+</style>

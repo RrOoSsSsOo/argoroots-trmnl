@@ -1,0 +1,100 @@
+<div class="layout layout--col layout--stretch">
+  <div class="columns">
+    {% comment %} Today's Column {% endcomment %}
+    <div class="column" data-list-max-columns="1" data-list-limit="true">
+      <span class="label label--small label--inverted group-header">Today</span>
+
+      {% for event in properties.timeseries %}
+      {% assign event_day = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
+      {% assign event_hour = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" %}
+
+      {% unless event_day == today and today_hours_to_show contains event_hour %}
+      {% continue %}
+      {% endunless %}
+
+      <div class="item">
+        <div class="meta w--6">
+          <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
+        </div>
+
+        <div class="content pb--1" data-code="{{ event.data.next_1_hours.summary.symbol_code }}">
+          <div class="flex flex--center-y gap--xsmall">
+            <img class="weather-icon" />
+
+            <div>
+              <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
+              <span class="label label--small">{{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }} · <span class="weather-description"></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% comment %} Tomorrow's Column {% endcomment %}
+    <div class="column" data-list-max-columns="1" data-list-limit="true">
+      <span class="label label--small label--inverted group-header">Tomorrow</span>
+
+      {% for event in properties.timeseries %}
+      {% assign event_day = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
+      {% assign event_hour = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" %}
+
+      {% unless event_day == tomorrow and tomorrow_hours_to_show contains event_hour %}
+      {% continue %}
+      {% endunless %}
+
+      <div class="item">
+        <div class="meta w--6">
+          <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
+        </div>
+
+        <div class="content pb--1" data-code="{{ event.data.next_1_hours.summary.symbol_code }}">
+          <div class="flex flex--center-y gap--xsmall">
+            <img class="weather-icon" />
+
+            <div>
+              <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
+              <span class="label label--small">{{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }} · <span class="weather-description"></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% comment %} Rest of Days Column {% endcomment %}
+    <div class="column gap--small" data-list-max-columns="1" data-list-limit="true">
+      {% for event in properties.timeseries %}
+      {% assign event_day = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
+      {% assign event_hour = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" %}
+      {% assign event_utc_hour = event.time | date: "%H" %}
+
+      {% unless event_day != today and event_day != tomorrow and nextday_hours_to_show contains event_utc_hour %}
+      {% continue %}
+      {% endunless %}
+
+      {% if day != event_day %}
+      {% assign day = event_day %}
+      <span class="label label--small label--inverted group-header">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%A" }}</span>
+      {% endif %}
+
+      <div class="item">
+        <div class="meta w--6">
+          <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
+        </div>
+
+        <div class="content" data-code="{{ event.data.next_6_hours.summary.symbol_code }}">
+          <div class="flex flex--center-y gap--xsmall">
+            <img class="weather-icon weather-icon-small" />
+
+            <div>
+              <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
+              <span class="label label--small">{{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }} · <span class="weather-description"></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

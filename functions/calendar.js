@@ -1,21 +1,3 @@
-/**
- * TRMNL Family Calendar Plugin - iCal Parser
- * 
- * A comprehensive RFC 5545 compliant iCal (.ics) parser for TRMNL e-paper displays.
- * Supports recurring events (RRULE), exception dates (EXDATE), recurrence exceptions (RECURRENCE-ID),
- * timezone conversion, and filters to show the next 25 upcoming events.
- * 
- * Features:
- * - Full iCal format support with line unfolding
- * - RRULE parsing for DAILY, WEEKLY, MONTHLY, YEARLY frequencies
- * - EXDATE handling with timezone conversion
- * - RECURRENCE-ID support for modified recurring event instances  
- * - Two-pass parsing architecture for proper exception handling
- * - Automatic deleted/cancelled event detection
- * - Timezone support (IANA identifiers and GMT offsets)
- * - All-day and timed event support
- */
-
 async function main (args) {
   if (!args.url) return { body: 'No URL provided' }
 
