@@ -72,13 +72,21 @@
           <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
         </div>
 
-        <div class="content" data-code="{{ event.data.next_1_hours.summary.symbol_code }}">
+        <div class="content" data-code="{{ event.data.next_6_hours.summary.symbol_code }}">
           <div class="flex flex--center-y gap--xsmall">
             <img class="weather-icon" />
 
             <div>
               <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
-              <span class="label label--small">{{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }} · <span class="weather-description"></span></span>
+              <span class="label label--small">
+                {{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }}
+                ·
+                {% if event.data.next_6_hours.details.precipitation_amount > 0 %}
+                {{ event.data.next_6_hours.details.precipitation_amount }}{{ properties.meta.units.precipitation_amount }}
+                ·
+                {% endif %}
+                <span class="weather-description"></span>
+              </span>
             </div>
           </div>
         </div>
@@ -103,13 +111,21 @@
           <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
         </div>
 
-        <div class="content" data-code="{{ event.data.next_1_hours.summary.symbol_code }}">
+        <div class="content" data-code="{{ event.data.next_6_hours.summary.symbol_code }}">
           <div class="flex flex--center-y gap--xsmall">
             <img class="weather-icon" />
 
             <div>
               <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
-              <span class="label label--small">{{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }} · <span class="weather-description"></span></span>
+              <span class="label label--small">
+                {{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }}
+                ·
+                {% if event.data.next_6_hours.details.precipitation_amount > 0 %}
+                {{ event.data.next_6_hours.details.precipitation_amount }}{{ properties.meta.units.precipitation_amount }}
+                ·
+                {% endif %}
+                <span class="weather-description"></span>
+              </span>
             </div>
           </div>
         </div>
@@ -144,7 +160,15 @@
 
             <div>
               <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
-              <span class="label label--small">{{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }} · <span class="weather-description"></span></span>
+              <span class="label label--small">
+                {{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }}
+                ·
+                {% if event.data.next_6_hours.details.precipitation_amount > 0 %}
+                {{ event.data.next_6_hours.details.precipitation_amount }}{{ properties.meta.units.precipitation_amount }}
+                ·
+                {% endif %}
+                <span class="weather-description"></span>
+              </span>
             </div>
           </div>
         </div>
