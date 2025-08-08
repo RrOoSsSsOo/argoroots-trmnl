@@ -28,10 +28,9 @@ custom_fields:
   - Võrk 4: V4
   - Võrk 5: V5
 - keyname: margin
-  field_type: number
+  field_type: string
   name: Seller Margin
   description: Set the margin (cents/kWh) that your electricity seller adds to the base price. This is used to calculate the total cost of electricity.
-  default: 0
 - keyname: timespan
   field_type: select
   name: Highlighted timespan
