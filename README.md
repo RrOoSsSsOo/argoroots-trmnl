@@ -1,10 +1,8 @@
 # TRMNL Plugins Collection
 
-This repository contains two plugins for [TRMNL](https://usetrmnl.com) e-paper screens.
+This repository contains three plugins for [TRMNL](https://usetrmnl.com) e-paper screens.
 
-## Plugins
-
-### 1. Börsihind - Estonian Electricity Prices
+## 1. Börsihind - Estonian Electricity Prices
 
 Displays Estonian electricity prices from [Börsihind.ee](https://börsihind.ee) with current pricing, component breakdown, and price trend visualization.
 
@@ -17,7 +15,7 @@ Displays Estonian electricity prices from [Börsihind.ee](https://börsihind.ee)
 
 **Location:** `/borsihind/`
 
-### 2. Family Calendar - iCal Parser
+## 2. Family Calendar - iCal Parser
 
 A comprehensive iCal (.ics) calendar parser that displays upcoming events from any calendar source with full RFC 5545 compliance.
 
@@ -40,8 +38,17 @@ A comprehensive iCal (.ics) calendar parser that displays upcoming events from a
 3. The function accepts a `url` parameter pointing to your iCal (.ics) calendar feed
 4. Returns parsed events in JSON format for display on TRMNL screens
 
-## Usage
+## 3. Met.no Weather Forecast
 
-1. Upload the desired plugin directory to your TRMNL plugin marketplace or development environment
-2. Configure the required settings (electricity plan for Börsihind, calendar URL for Family Calendar)
-3. Choose your preferred layout size
+A weather forecast plugin that displays current and upcoming weather conditions using data from The Norwegian Meteorological Institute (met.no).
+
+**Features:**
+- **Current Weather**: Shows today's hourly weather forecast with temperature, wind speed, and precipitation
+- **Multi-day Forecast**: Displays weather for today, tomorrow, and upcoming days
+- **Weather Icons**: Visual weather symbols based on met.no weather codes
+- **Configurable Location**: Set custom latitude and longitude coordinates for any location
+- **Multi-language Support**: Available in Estonian, English, Norwegian, Finnish, and Swedish
+- **Multiple Layouts**: Full, half horizontal, half vertical, and quadrant layout options
+- **Detailed Metrics**: Temperature, wind speed, and precipitation amount for each forecast period
+
+**Location:** `/met-no/`
