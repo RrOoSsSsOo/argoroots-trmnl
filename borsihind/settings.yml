@@ -17,25 +17,30 @@ custom_fields:
   learn_more_url: https://www.borsihind.ee
   email_address: argo@roots.ee
 - keyname: plan
+  field_type: select
   name: Pricing plan
   description: Select your Elektrilevi network pricing plan. Each plan has different transmission rates that affect your total electricity cost.
-  field_type: select
+  default: V1
+  optional: false
   options:
   - Võrk 1: V1
   - Võrk 2: V2
   - Võrk 4: V4
   - Võrk 5: V5
-  default: V1
-  optional: false
+- keyname: margin
+  field_type: number
+  name: Seller Margin
+  description: Set the margin (cents/kWh) that your electricity seller adds to the base price. This is used to calculate the total cost of electricity.
+  default: 0
 - keyname: timespan
+  field_type: select
   name: Highlighted timespan
   description: Choose which cheapest hour period to highlight with special styling on the display.
-  field_type: select
+  optional: true
   options:
   - 1 hour: 1
   - 2 hours: 2
   - 3 hours: 3
   - 4 hours: 4
-  optional: true
 name: Börsihind.ee
 refresh_interval: 15

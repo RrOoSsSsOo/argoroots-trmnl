@@ -58,6 +58,43 @@
 {% assign tomorrow_hours_to_show = "00,03,06,09,12,15,18,21" %}
 {% assign nextday_hours_to_show = "00,06,12,18" %}
 
+{% template header %}
+<span class="label label--small label--inverted group-header">{{ title }}</span>
+{% endtemplate %}
+
+{% template item %}
+{% if size == "small" %}
+{% assign content_class = "content" %}
+{% else %}
+{% assign content_class = "content pb--1" %}
+{% endif %}
+
+<div class="item">
+  <div class="meta w--6">
+    <span class="index">{{ index }}</span>
+  </div>
+
+  <div class="{{ content_class }}" data-code="{{ symbol_code }}">
+    <div class="flex flex--center-y gap--xsmall">
+      <img class="weather-icon" />
+
+      <div>
+        <span class="title title--small">{{ air_temperature }}°</span>
+        <span class="label label--small">
+          {{ wind_speed }}{{ properties.meta.units.wind_speed_unit }}
+          ·
+          {% if precipitation_amount > 0 %}
+          {{ precipitation_amount }}{{ properties.meta.units.precipitation_amount }}
+          ·
+          {% endif %}
+          <span class="weather-description"></span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endtemplate %}
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const weather = {

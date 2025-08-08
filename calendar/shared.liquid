@@ -1,3 +1,41 @@
+{% template header %}
+<span class="label label--small label--inverted group-header">{{ start }}</span>
+{% endtemplate %}
+
+{% template event %}
+<div class="item mb--1">
+  <div class="meta w--6">
+    <span class="index">{{ start | date: "%s" | plus: trmnl.user.utc_offset | date: "%-d" }}</span>
+  </div>
+
+  <div class="content">
+    <span class="title title--small">{{ title }}</span>
+
+    <div class="flex">
+      {% if start contains 'T' %}
+      <span class="label label--small label--underline">
+        {{ start | date: "%s" | plus: trmnl.user.utc_offset | date: "%H:%M" }}
+        –
+        {{ end | date: "%s" | plus: trmnl.user.utc_offset | date: "%H:%M" }}
+      </span>
+      {% endif %}
+
+      {% if address %}
+      <span class="label label--small stretch">
+        {{ address }}
+      </span>
+      {% endif %}
+    </div>
+
+    {% if description %}
+    <span class="description">
+      {{ description }}
+    </span>
+    {% endif %}
+  </div>
+</div>
+{% endtemplate %}
+
 <style>
   .label--inverted.group-header {
     border-radius: 0 !important;

@@ -1,3 +1,47 @@
+{% template pricelist %}
+<table class="table table--condensed">
+  <tbody>
+    <tr>
+      <td><span class="label label--small">Elektri hind</span></td>
+      <td><span class="label label--small text--right" id="current-electricity-price"></span></td>
+    </tr>
+    <tr>
+      <td><span class="label label--small">Edastamise tasu</span></td>
+      <td><span class="label label--small text--right" id="current-transmission-cost"></span></td>
+    </tr>
+    <tr>
+      <td><span class="label label--small">Taastuvenergia tasu</span></td>
+      <td><span class="label label--small text--right" id="current-renewable-fee"></span></td>
+    </tr>
+    <tr>
+      <td><span class="label label--small">Elektriaktsiis</span></td>
+      <td><span class="label label--small text--right" id="current-excise"></span></td>
+    </tr>
+    <tr>
+      <td><span class="label label--small">Müüa marginaal</span></td>
+      <td><span class="label label--small text--right" id="current-margin"></span></td>
+    </tr>
+  </tbody>
+</table>
+{% endtemplate %}
+
+{% template timespan %}
+<div class="w--full flex flex--row flex--top pt--1 px--3" id="cheapest-{{ hours }}h-container">
+  <div class="label label--small label--inverted px--2">{{ hours }}h</div>
+  <div class="stretch">
+    <div class="w--full flex flex--row">
+      <span class="title title--small" id="cheapest-{{ hours }}h-start"></span>
+      <span class="title title--small text--center stretch">-</span>
+      <span class="title title--small" id="cheapest-{{ hours }}h-end"></span>
+    </div>
+    <div class="flex flex--row">
+      <span class="label label--small stretch" id="cheapest-{{ hours }}h-value"></span>
+      <span class="label label--small" id="cheapest-{{ hours }}h-diff"></span>
+    </div>
+  </div>
+</div>
+{% endtemplate %}
+
 <script src='https://code.highcharts.com/highcharts.js'></script>
 <script src='https://code.highcharts.com/modules/pattern-fill.js'></script>
 
@@ -6,6 +50,7 @@
     // Data format: [year, month, day, hour, electricity_price, transmission_cost, renewable_energy_fee, electricity_excise]
     const rawData = {{ data | json }}
     const selectedTimespan = '{{ trmnl.plugin_settings.custom_fields_values.timespan }}'
+    const margin = (parseFloat('{{ trmnl.plugin_settings.custom_fields_values.margin }}'.replace(',', '.')) || 0) / 100
 
     // Data structure mapping for better maintainability
     const DATA_FIELDS = {
@@ -24,7 +69,8 @@
       { key: 'electricityPrice', label: 'Elektri hind', field: DATA_FIELDS.electricityPrice },
       { key: 'transmissionCost', label: 'Edastamise tasu', field: DATA_FIELDS.transmissionCost },
       { key: 'renewableEnergyFee', label: 'Taastuvenergia tasu', field: DATA_FIELDS.renewableEnergyFee },
-      { key: 'electricityExcise', label: 'Elektriaktsiis', field: DATA_FIELDS.electricityExcise }
+      { key: 'electricityExcise', label: 'Elektriaktsiis', field: DATA_FIELDS.electricityExcise },
+      { key: 'margin', label: 'Müüa marginaal', value: margin }
     ]
 
     // Find the lowest total cost time span of specified duration
@@ -36,7 +82,8 @@
         x[DATA_FIELDS.electricityPrice] +
         x[DATA_FIELDS.transmissionCost] +
         x[DATA_FIELDS.renewableEnergyFee] +
-        x[DATA_FIELDS.electricityExcise]
+        x[DATA_FIELDS.electricityExcise] +
+        margin
       )
 
       let lowestSum = Infinity
@@ -74,7 +121,8 @@
           hourData[DATA_FIELDS.electricityPrice] +
           hourData[DATA_FIELDS.transmissionCost] +
           hourData[DATA_FIELDS.renewableEnergyFee] +
-          hourData[DATA_FIELDS.electricityExcise]
+          hourData[DATA_FIELDS.electricityExcise] +
+          margin
         )
 
         let minutesInThisHour = 60
@@ -116,7 +164,8 @@
       firstRowValues[DATA_FIELDS.electricityPrice] +
       firstRowValues[DATA_FIELDS.transmissionCost] +
       firstRowValues[DATA_FIELDS.renewableEnergyFee] +
-      firstRowValues[DATA_FIELDS.electricityExcise]
+      firstRowValues[DATA_FIELDS.electricityExcise] +
+      margin
     ) * 100
 
     // Calculate cheapest periods
@@ -170,7 +219,7 @@
       }
     ]
 
-      // Update displayed price values
+    // Update displayed price values
     const currentValueEl = document.getElementById('current-value')
     if (currentValueEl) currentValueEl.textContent = displayItems[0].value
 
@@ -246,7 +295,7 @@
       if (selectedContainer) selectedContainer.classList.add('timespan-selected')
     }
 
-      // Update current price component breakdown (convert to cents)
+    // Update current price component breakdown (convert to cents)
     const currentElectricityPriceEl = document.getElementById('current-electricity-price')
     if (currentElectricityPriceEl) currentElectricityPriceEl.textContent = (firstRowValues[DATA_FIELDS.electricityPrice] * 100).toFixed(2)
 
@@ -259,6 +308,9 @@
     const currentExciseEl = document.getElementById('current-excise')
     if (currentExciseEl) currentExciseEl.textContent = (firstRowValues[DATA_FIELDS.electricityExcise] * 100).toFixed(2)
 
+    const currentMarginEl = document.getElementById('current-margin')
+    if (currentMarginEl) currentMarginEl.textContent = (margin * 100)
+
     // Prepare chart data
     // Convert hours to formatted categories for x-axis
     const categories = rawData.map(x => x[DATA_FIELDS.hour].toString().padStart(2, '0'))
@@ -266,10 +318,10 @@
     // Transform data into chart series format (convert to cents)
     const formattedBarData = METRICS.map(metric => ({
       name: metric.label,
-      data: rawData.map(x => x[metric.field] * 100)
+      data: rawData.map(x => (metric.value || x[metric.field]) * 100)
     }))
 
-      // Initialize Highcharts stacked column chart
+    // Initialize Highcharts stacked column chart
     Highcharts.chart('example-bar-chart', {
       accessibility: {
         enabled: false
@@ -305,14 +357,14 @@
       // Data series with distinct visual styles for each metric
       series: [{
         data: formattedBarData[0].data,
-        color: '#000000',
-        name: formattedBarData[0].name
+        name: formattedBarData[0].name,
+        color: '#000000'
       }, {
         data: formattedBarData[1].data,
         name: formattedBarData[1].name,
         color: {
           pattern: {
-            image: 'https://usetrmnl.com/images/grayscale/gray-3.png',
+            image: 'https://usetrmnl.com/images/grayscale/gray-2.png',
             width: 12,
             height: 12
           }
@@ -322,7 +374,7 @@
         name: formattedBarData[2].name,
         color: {
           pattern: {
-            image: 'https://usetrmnl.com/images/grayscale/gray-4.png',
+            image: 'https://usetrmnl.com/images/grayscale/gray-3.png',
             width: 12,
             height: 12
           }
@@ -330,6 +382,16 @@
       }, {
         data: formattedBarData[3].data,
         name: formattedBarData[3].name,
+        color: {
+          pattern: {
+            image: 'https://usetrmnl.com/images/grayscale/gray-4.png',
+            width: 12,
+            height: 12
+          }
+        }
+      }, {
+        data: formattedBarData[4].data,
+        name: formattedBarData[4].name,
         color: {
           pattern: {
             image: 'https://usetrmnl.com/images/grayscale/gray-5.png',

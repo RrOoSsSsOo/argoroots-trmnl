@@ -57,7 +57,7 @@
   <div class="columns">
     {% comment %} Today's Column {% endcomment %}
     <div class="column gap--xsmall" data-list-max-columns="1" data-list-limit="true">
-      <span class="label label--small label--inverted group-header">Today</span>
+      {% render "header", title: "Today" %}
 
       {% for event in properties.timeseries %}
       {% assign event_day = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
@@ -67,36 +67,14 @@
       {% continue %}
       {% endunless %}
 
-      <div class="item">
-        <div class="meta w--6">
-          <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
-        </div>
+      {% render "item", size: "small", index: event_hour, symbol_code: event.data.next_6_hours.summary.symbol_code, air_temperature: event.data.instant.details.air_temperature, wind_speed: event.data.instant.details.wind_speed, precipitation_amount: event.data.next_6_hours.details.precipitation_amount %}
 
-        <div class="content" data-code="{{ event.data.next_6_hours.summary.symbol_code }}">
-          <div class="flex flex--center-y gap--xsmall">
-            <img class="weather-icon" />
-
-            <div>
-              <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
-              <span class="label label--small">
-                {{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }}
-                ·
-                {% if event.data.next_6_hours.details.precipitation_amount > 0 %}
-                {{ event.data.next_6_hours.details.precipitation_amount }}{{ properties.meta.units.precipitation_amount }}
-                ·
-                {% endif %}
-                <span class="weather-description"></span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
       {% endfor %}
     </div>
 
     {% comment %} Tomorrow's Column {% endcomment %}
     <div class="column gap--xsmall" data-list-max-columns="1" data-list-limit="true">
-      <span class="label label--small label--inverted group-header">Tomorrow</span>
+      {% render "header", title: "Tomorrow" %}
 
       {% for event in properties.timeseries %}
       {% assign event_day = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
@@ -106,30 +84,8 @@
       {% continue %}
       {% endunless %}
 
-      <div class="item">
-        <div class="meta w--6">
-          <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
-        </div>
+      {% render "item", size: "small", index: event_hour, symbol_code: event.data.next_6_hours.summary.symbol_code, air_temperature: event.data.instant.details.air_temperature, wind_speed: event.data.instant.details.wind_speed, precipitation_amount: event.data.next_6_hours.details.precipitation_amount %}
 
-        <div class="content" data-code="{{ event.data.next_6_hours.summary.symbol_code }}">
-          <div class="flex flex--center-y gap--xsmall">
-            <img class="weather-icon" />
-
-            <div>
-              <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
-              <span class="label label--small">
-                {{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }}
-                ·
-                {% if event.data.next_6_hours.details.precipitation_amount > 0 %}
-                {{ event.data.next_6_hours.details.precipitation_amount }}{{ properties.meta.units.precipitation_amount }}
-                ·
-                {% endif %}
-                <span class="weather-description"></span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
       {% endfor %}
     </div>
 
@@ -137,6 +93,7 @@
     <div class="column gap--xsmall" data-list-max-columns="1" data-list-limit="true">
       {% for event in properties.timeseries %}
       {% assign event_day = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
+      {% assign event_day_name = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%A" %}
       {% assign event_hour = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" %}
       {% assign event_utc_hour = event.time | date: "%H" %}
 
@@ -146,33 +103,11 @@
 
       {% if day != event_day %}
       {% assign day = event_day %}
-      <span class="label label--small label--inverted group-header">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%A" }}</span>
+      {% render "header", title: event_day_name %}
       {% endif %}
 
-      <div class="item">
-        <div class="meta w--6">
-          <span class="index">{{ event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" }}</span>
-        </div>
+      {% render "item", size: "small", index: event_hour, symbol_code: event.data.next_6_hours.summary.symbol_code, air_temperature: event.data.instant.details.air_temperature, wind_speed: event.data.instant.details.wind_speed, precipitation_amount: event.data.next_6_hours.details.precipitation_amount %}
 
-        <div class="content" data-code="{{ event.data.next_6_hours.summary.symbol_code }}">
-          <div class="flex flex--center-y gap--xsmall">
-            <img class="weather-icon weather-icon-small" />
-
-            <div>
-              <span class="title title--small">{{ event.data.instant.details.air_temperature }}°</span>
-              <span class="label label--small">
-                {{ event.data.instant.details.wind_speed }}{{ properties.meta.units.wind_speed }}
-                ·
-                {% if event.data.next_6_hours.details.precipitation_amount > 0 %}
-                {{ event.data.next_6_hours.details.precipitation_amount }}{{ properties.meta.units.precipitation_amount }}
-                ·
-                {% endif %}
-                <span class="weather-description"></span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
       {% endfor %}
     </div>
   </div>
