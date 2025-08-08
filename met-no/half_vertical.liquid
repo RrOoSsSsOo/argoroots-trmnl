@@ -1,4 +1,32 @@
 <div class="layout layout--col layout--stretch">
+  {% if trmnl.plugin_settings.custom_fields_values.layout == "hourly" %}
+
+  <div class="columns">
+    <div class="column" data-list-max-columns="2" data-list-limit="true">
+      {% for event in properties.timeseries %}
+      {% assign event_day = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
+      {% assign event_day_name = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%A" %}
+      {% assign event_hour = event.time | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" %}
+
+      {% if event_day != day %}
+      {% assign day = event_day %}
+      {% if event_day == today %}
+      {% render "header", title: "Today" %}
+      {% elsif event_day == tomorrow %}
+      {% render "header", title: "Tomorrow" %}
+      {% else %}
+      {% render "header", title: event_day_name %}
+      {% endif %}
+      {% endif %}
+
+      {% render "item", size: "small", index: event_hour, symbol_code: event.data.next_1_hours.summary.symbol_code, air_temperature: event.data.instant.details.air_temperature, wind_speed: event.data.instant.details.wind_speed, precipitation_amount: event.data.next_1_hours.details.precipitation_amount %}
+
+      {% endfor %}
+    </div>
+  </div>
+
+  {% else %}
+
   <div class="columns">
     {% comment %} Today's Column {% endcomment %}
     <div class="column gap--small" data-list-max-columns="1" data-list-limit="true">
@@ -34,4 +62,6 @@
       {% endfor %}
     </div>
   </div>
+
+  {% endif %}
 </div>

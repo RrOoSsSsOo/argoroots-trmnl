@@ -42,5 +42,14 @@ custom_fields:
   - Svenska: sv
   default: en
   optional: false
+- keyname: layout
+  name: Layout
+  description: Choose the layout for the weather forecast. Hourly shows full list of upcoming hours, while Default tries to show also next days.
+  field_type: select
+  options:
+  - Default: default
+  - Hourly: hourly
+  default: default
+  optional: true
 name: Met.no Forecast
 refresh_interval: 15
