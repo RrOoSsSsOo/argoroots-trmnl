@@ -1,5 +1,7 @@
 {% assign today = "now" | date: "%s" | plus: trmnl.user.utc_offset | date: "%Y-%m-%d" %}
 {% assign tomorrow = "now" | date: "%s" | plus: trmnl.user.utc_offset | plus: 86400 | date: "%Y-%m-%d" %}
+{% assign third_day = "now" | date: "%s" | plus: trmnl.user.utc_offset | plus: 172800 | date: "%Y-%m-%d" %}
+{% assign fourth_day = "now" | date: "%s" | plus: trmnl.user.utc_offset | plus: 259200 | date: "%Y-%m-%d" %}
 {% assign current_hour = "now" | date: "%s" | plus: trmnl.user.utc_offset | date: "%H" %}
 
 {% case current_hour %}
@@ -59,7 +61,7 @@
 {% assign nextday_hours_to_show = "00,06,12,18" %}
 
 {% template header %}
-<span class="label label--small label--inverted group-header">{{ title }}</span>
+<span class="label label--small label--inverted group-header w--full" data-group-header="true">{{ title }}</span>
 {% endtemplate %}
 
 {% template item %}
@@ -79,12 +81,12 @@
       <img class="weather-icon" />
 
       <div>
-        <span class="title title--small">{{ air_temperature }}°</span>
-        <span class="label label--small">
-          {{ wind_speed }}{{ properties.meta.units.wind_speed_unit }}
+        <span class="title title--small">{{ air_temperature }}°</span><br>
+        <span class="label label--small" style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">
+          {{ wind_speed }}{{ units.wind_speed }}
           ·
           {% if precipitation_amount > 0 %}
-          {{ precipitation_amount }}{{ properties.meta.units.precipitation_amount }}
+          {{ precipitation_amount }}{{ units.precipitation_amount }}
           ·
           {% endif %}
           <span class="weather-description"></span>
