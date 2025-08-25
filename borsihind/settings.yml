@@ -18,7 +18,7 @@ custom_fields:
   email_address: argo@roots.ee
 - keyname: plan
   field_type: select
-  name: Pricing plan
+  name: Pricing Plan
   description: Select your Elektrilevi network pricing plan. Each plan has different transmission rates that affect your total electricity cost.
   default: V1
   optional: false
@@ -33,7 +33,7 @@ custom_fields:
   description: Set the margin (cents/kWh) that your electricity seller adds to the base price. This is used to calculate the total cost of electricity.
 - keyname: timespan
   field_type: select
-  name: Highlighted timespan
+  name: Highlighted Timespan
   description: Choose which cheapest hour period to highlight with special styling on the display.
   optional: true
   options:
